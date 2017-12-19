@@ -97,6 +97,14 @@ enum MessageType {
 	MessageType_DebugLinkMemory = 111 [(wire_debug_out) = true];
 	MessageType_DebugLinkMemoryWrite = 112 [(wire_debug_in) = true];
 	MessageType_DebugLinkFlashErase = 113 [(wire_debug_in) = true];
+
+	MessageType_LiskGetAddress = 114 [(wire_in) = true];
+	MessageType_LiskAddress = 115 [(wire_out) = true];
+	MessageType_LiskSignTx = 116 [(wire_in) = true];
+	MessageType_LiskSignedTx = 117 [(wire_out) = true];
+	MessageType_LiskSignMessage = 118 [(wire_in) = true];
+	MessageType_LiskMessageSignature = 119 [(wire_out) = true];
+	MessageType_LiskVerifyMessage = 120 [(wire_in) = true];
 }
 
 ////////////////////
@@ -937,6 +945,82 @@ message CosiSign {
  */
 message CosiSignature {
 	optional bytes signature = 1;		// Signature
+}
+
+////////////////////
+// Lisk messages //
+//////////////////
+
+/**
+ * Request: Ask device for Lisk address corresponding to address_n path
+ * @next PassphraseRequest
+ * @next LiskAddress
+ * @next Failure
+ */
+ message LiskGetAddress {
+	repeated uint32 address_n = 1;			// BIP-32 path to derive the key from master node
+	optional bool show_display = 2;			// Optionally show on display before sending the result
+}
+
+/**
+ * Response: Contains Lisk address derived from device private seed
+ * @prev LiskGetAddress
+ */
+ message LiskAddress {
+	required string address = 1;		// Lisk address
+}
+
+/**
+ * Request: Ask device to sign Lisk transaction
+ * @next LiskSignedTx
+ */
+ message LiskSignTx {
+	 optional LiskTransactionType type = 1;
+	 optional string amount = 2 [default='0'];
+	 optional uint32 fee = 3;
+	 optional string recipient_id = 4;
+	 optional string recipient_public_key = 5;
+	 optional string sender_public_key = 6;
+	 optional uint32 timestamp = 7;
+	 optional LiskTransactionAsset asset = 8;
+}
+
+/**
+* Response: Contains Lisk transaction signature
+* @prev LiskSignTx
+*/
+message LiskSignedTx {
+	optional bytes signature = 1;
+}
+
+
+/**
+* Request: Ask device to sign message
+* @next LiskMessageSignature
+* @next Failure
+*/
+message LiskSignMessage {
+	repeated uint32 address_m = 1;
+	optional bytes message = 2;
+}
+
+/**
+ * Request: Ask device to verify message
+ * @next Success
+ * @next Failure
+ */
+message LiskMessageSignature {
+	optional bytes address = 1;
+	optional bytes signature = 2;
+}
+
+/**
+ * Response: Signed message
+ * @prev LiskSignMessage
+ */
+message LiskVerifyMessage {
+	optional bytes signature = 1;
+	optional bytes public_key = 2;
 }
 
 /////////////////////////////////////////////////////////////
