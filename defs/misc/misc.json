@@ -213,5 +213,18 @@
         },
         "wallet": {},
         "blockchain_link": {}
+    },
+    {
+        "name": "RISE",
+        "shortcut": "RISE",
+        "slip44": 1120,
+        "curve": "ed25519",
+        "decimals": 8,
+        "links": {
+            "Homepage": "https://rise.vision",
+            "Github": "https://github.com/RiseVision"
+        },
+        "wallet": {},
+        "blockchain_link": {}
     }
 ]

@@ -134,6 +134,17 @@ enum MessageType {
     MessageType_LiskGetPublicKey = 121 [(wire_in) = true];
     MessageType_LiskPublicKey = 122 [(wire_out) = true];
 
+    // RISE
+    MessageType_RISEGetAddress = 123 [(wire_in) = true];
+    MessageType_RISEAddress = 124 [(wire_out) = true];
+    MessageType_RISESignTx = 125 [(wire_in) = true];
+    MessageType_RISESignedTx = 126 [(wire_out) = true];
+    MessageType_RISESignMessage = 127 [(wire_in) = true];
+    MessageType_RISEMessageSignature = 128 [(wire_out) = true];
+    MessageType_RISEVerifyMessage = 129 [(wire_in) = true];
+    MessageType_RISEGetPublicKey = 130 [(wire_in) = true];
+    MessageType_RISEPublicKey = 131 [(wire_out) = true];
+
     // Tezos
     MessageType_TezosGetAddress = 150 [(wire_in) = true];
     MessageType_TezosAddress = 151 [(wire_out) = true];

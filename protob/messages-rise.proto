@@ -1,0 +1,148 @@
+syntax = "proto2";
+package hw.trezor.messages.rise;
+
+// Sugar for easier handling in Java
+option java_package = "com.satoshilabs.trezor.lib.protobuf";
+option java_outer_classname = "TrezorMessageRISE";
+
+/**
+ * Request: Ask device for RISE address corresponding to address_n path
+ * @start
+ * @next RISEAddress
+ * @next Failure
+ */
+message RISEGetAddress {
+    repeated uint32 address_n = 1;  // BIP-32 path to derive the key from master node
+    optional bool show_display = 2; // Optionally show on display before sending the result
+}
+
+/**
+ * Response: Contains RISE address derived from device private seed
+ * @end
+ */
+message RISEAddress {
+    optional string address = 1;    // RISE address
+}
+
+/**
+ * Request: Ask device for RISE public key corresponding to address_n path
+ * @start
+ * @next RISEPublicKey
+ */
+message RISEGetPublicKey {
+    repeated uint32 address_n = 1;  // BIP-32 path to derive the key from master node
+    optional bool show_display = 2; // Optionally show on display before sending the result
+}
+
+/**
+ * Response: Contains RISE public key derived from device private seed
+ * @end
+ */
+message RISEPublicKey {
+    optional bytes public_key = 1;  // RISE public key
+}
+
+/**
+ * Request: Ask device to sign RISE transaction
+ * @start
+ * @next RISESignedTx
+ * @next Failure
+ */
+message RISESignTx {
+    repeated uint32 address_n = 1;                  // BIP-32 path to derive the key from master node
+    optional RISETransactionCommon transaction = 2; // RISE transaction structure
+    /**
+     * Structure representing the common part for RISE transactions
+     */
+    message RISETransactionCommon {
+        optional RISETransactionType type = 1;
+        optional uint64 amount = 2 [default=0];
+        optional uint64 fee = 3;
+        optional string recipient_id = 4;
+        optional bytes sender_public_key = 5;
+        optional bytes requester_public_key = 6;
+        optional bytes signature = 7;
+        optional uint32 timestamp = 8;
+        optional RISETransactionAsset asset = 9;
+        /**
+         * Type of RISE transaction
+         */
+        enum RISETransactionType {
+            Transfer = 0;
+            RegisterSecondPassphrase = 1;
+            RegisterDelegate = 2;
+            CastVotes = 3;
+            RegisterMultisignatureAccount = 4;
+        }
+        /**
+         * Structure representing the asset field in the RISE transaction
+         */
+        message RISETransactionAsset {
+            optional RISESignatureType signature = 1;
+            optional RISEDelegateType delegate = 2;
+            repeated string votes = 3;
+            optional RISEMultisignatureType multisignature = 4;
+            /**
+             * Structure representing the signature field in the RISE transaction asset field
+             */
+            message RISESignatureType {
+                optional bytes public_key = 1;
+            }
+            /**
+             * Structure representing the delegate field in the RISE transaction asset field
+             */
+            message RISEDelegateType {
+                optional string username  = 1;
+            }
+            /**
+             * Structure representing the multisignature field in the RISE transaction asset field
+             */
+            message RISEMultisignatureType {
+                optional uint32 min = 1;
+                optional uint32 life_time = 2;
+                repeated string keys_group = 3;
+            }
+        }
+    }
+}
+
+/**
+ * Response: Contains RISE transaction signature
+ * @end
+ */
+message RISESignedTx {
+    optional bytes signature = 1;
+}
+
+/**
+ * Request: Ask device to sign message
+ * @start
+ * @next RISEMessageSignature
+ * @next Failure
+ */
+message RISESignMessage {
+    repeated uint32 address_n = 1;
+    optional bytes message = 2;
+}
+
+/**
+ * Response: Signed message
+ * @end
+ */
+message RISEMessageSignature {
+    optional bytes public_key = 1;
+    optional bytes signature = 2;
+}
+
+/**
+ * Request: Ask device to verify message
+ * @start
+ * @next Success
+ * @next Failure
+ */
+message RISEVerifyMessage {
+    optional bytes public_key = 1;
+    optional bytes signature = 2;
+    optional bytes message = 3;
+}
+
